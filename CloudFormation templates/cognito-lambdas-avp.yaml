@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'cognito-lambdas-avp SAM Template for cognito-lambdas AVP
+
+  '
+Globals:
+  Function:
+    Handler: app.lambdaHandler
+    MemorySize: 1024
+    Timeout: 30
+    Tracing: Active
+    Architectures:
+    - x86_64
+Parameters:
+  AllowedAudience:
+    Type: String
+    Default: ''
+  JWKSEndpoint:
+    Type: String
+    Default: ''
+  PolicyStoreId:
+    Type: String
+    Default: ''
+Resources:
+  APIGWAuthZLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-APIGWAuthZLambda
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas-avp/3c5037cae549ada209166d0bce554693
+      Runtime: python3.11
+      Environment:
+        Variables:
+          ALLOWED_AUDIENCE:
+            Ref: AllowedAudience
+          JWKS_ENDPOINT:
+            Ref: JWKSEndpoint
+          POLICY_STORE_ID:
+            Ref: PolicyStoreId
+      Policies:
+      - Statement:
+        - Sid: VerifiedPermissionsAndLogsPolicy
+          Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          - verifiedpermissions:IsAuthorized
+          Resource: '*'
+    Metadata:
+      SamResourceId: APIGWAuthZLambda

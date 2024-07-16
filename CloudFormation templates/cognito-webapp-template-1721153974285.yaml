@@ -1,0 +1,240 @@
+---
+Metadata:
+  TemplateId: "arn:aws:cloudformation:us-west-2:381492204116:generatedTemplate/3014e296-08a1-437e-b0d2-fd00fa1ba76c"
+Resources:
+  ApiGatewayStage00Stage00GKUPe:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Stage"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId: "jfkfhkcth4"
+      DeploymentId: "h48ptk"
+      StageName: "Stage"
+      TracingEnabled: false
+      CacheClusterEnabled: false
+  ApiGatewayDeployment00h8vclo00ItATI:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  ApiGatewayDeployment002q9oz2001w7We:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  IAMRole00CognitoBuilderClass01UnauthRole00SNpUH:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::Role"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/service-role/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::381492204116:policy/service-role/Cognito-unauthenticated-1720808018786"
+      MaxSessionDuration: 3600
+      RoleName: "Cognito_BuilderClass01Unauth_Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Condition:
+            StringEquals:
+              cognito-identity.amazonaws.com:aud: "us-west-2:2d1b32cb-e255-4e44-8e25-e2b7c54f9863"
+            ForAnyValue:StringLike:
+              cognito-identity.amazonaws.com:amr: "unauthenticated"
+          Action: "sts:AssumeRoleWithWebIdentity"
+          Effect: "Allow"
+          Principal:
+            Federated: "cognito-identity.amazonaws.com"
+  IAMManagedPolicy00policyserviceroleCognitoauthenticated172080801878600KWpRu:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::ManagedPolicy"
+    DeletionPolicy: "Retain"
+    Properties:
+      ManagedPolicyName: "Cognito-authenticated-1720808018786"
+      Path: "/service-role/"
+      Description: ""
+      Groups: []
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Resource:
+          - "*"
+          Action:
+          - "mobileanalytics:PutEvents"
+          - "cognito-sync:*"
+          - "cognito-identity:*"
+          Effect: "Allow"
+        - Condition:
+            StringEquals:
+              s3:prefix: "${aws:PrincipalTag/department}"
+          Resource: "*"
+          Action:
+          - "s3:List*"
+          Effect: "Allow"
+      Roles:
+      - Ref: "IAMRole00CognitoBuilderClass01AuthRole006ted8"
+      Users: []
+  ApiGatewayDeployment00a92t7p00Yv7hO:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  IAMRole00CognitoBuilderClass01AuthRole006ted8:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::Role"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/service-role/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::381492204116:policy/service-role/Cognito-authenticated-1720808018786"
+      MaxSessionDuration: 3600
+      RoleName: "Cognito_BuilderClass01Auth_Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Condition:
+            StringEquals:
+              cognito-identity.amazonaws.com:aud: "us-west-2:2d1b32cb-e255-4e44-8e25-e2b7c54f9863"
+            ForAnyValue:StringLike:
+              cognito-identity.amazonaws.com:amr: "authenticated"
+          Action:
+          - "sts:AssumeRoleWithWebIdentity"
+          - "sts:TagSession"
+          Effect: "Allow"
+          Principal:
+            Federated: "cognito-identity.amazonaws.com"
+  ApiGatewayDeployment00y8t76w00UWQSE:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  IAMManagedPolicy00policyserviceroleCognitounauthenticated172080801878600yQleo:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::ManagedPolicy"
+    DeletionPolicy: "Retain"
+    Properties:
+      ManagedPolicyName: "Cognito-unauthenticated-1720808018786"
+      Path: "/service-role/"
+      Description: ""
+      Groups: []
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Resource:
+          - "*"
+          Action:
+          - "cognito-identity:GetCredentialsForIdentity"
+          Effect: "Allow"
+      Roles:
+      - Ref: "IAMRole00CognitoBuilderClass01UnauthRole00SNpUH"
+      Users: []
+  WAFv2WebACL00REGIONAL00Jqw0O:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::WAFv2::WebACL"
+    DeletionPolicy: "Retain"
+    Properties:
+      Description: ""
+      DefaultAction:
+        Allow: {}
+      Scope: "REGIONAL"
+      Rules:
+      - Action:
+          Captcha: {}
+        RuleLabels: []
+        VisibilityConfig:
+          SampledRequestsEnabled: true
+          MetricName: "rate-limit-captcha"
+          CloudWatchMetricsEnabled: true
+        Priority: 0
+        Statement:
+          RateBasedStatement:
+            AggregateKeyType: "IP"
+            EvaluationWindowSec: 300
+            Limit: 101
+        Name: "rate-limit-captcha"
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        MetricName: "cognito-waf-test"
+        CloudWatchMetricsEnabled: true
+      Name: "BuilderClass01"
+  ApiGatewayRestApi00q7ciunqce200HRQbv:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::RestApi"
+    DeletionPolicy: "Retain"
+    Properties:
+      ApiKeySourceType: "HEADER"
+      Description: "Your first API with Amazon API Gateway. This is a sample API that\
+        \ integrates via HTTP with our demo Pet Store endpoints"
+      EndpointConfiguration:
+        Types:
+        - "REGIONAL"
+      DisableExecuteApiEndpoint: false
+      Name: "PetStore"
+  ApiGatewayDeployment00e4ewar00eWew9:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  ApiGatewayStage00Prod00B4ToJ:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Stage"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+      DeploymentId:
+        Fn::GetAtt:
+        - "ApiGatewayDeployment00y8t76w00UWQSE"
+        - "DeploymentId"
+      StageName: "Prod"
+      CacheClusterSize: "0.5"
+      TracingEnabled: false
+      CacheClusterEnabled: false
+  ApiGatewayDeployment00exppcl00hU2cl:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  LambdaPermission00functioncognitowebappCognitoWebApp00xEFWL:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Lambda::Permission"
+    DeletionPolicy: "Retain"
+    Properties:
+      FunctionName: "arn:aws:lambda:us-west-2:381492204116:function:cognito-webapp-CognitoWebApp"
+      Action: "lambda:InvokeFunction"
+      SourceArn: "arn:aws:execute-api:us-west-2:381492204116:jfkfhkcth4/*/*/"
+      Principal: "apigateway.amazonaws.com"
+  ApiGatewayDeployment00xx4gbl00AHJpf:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  ApiGatewayDeployment00ap0utd00luY1i:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::ApiGateway::Deployment"
+    DeletionPolicy: "Retain"
+    Properties:
+      RestApiId:
+        Ref: "ApiGatewayRestApi00q7ciunqce200HRQbv"
+  LambdaPermission00functioncognitowebappCognitoWebApp009qSoH:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Lambda::Permission"
+    DeletionPolicy: "Retain"
+    Properties:
+      FunctionName: "arn:aws:lambda:us-west-2:381492204116:function:cognito-webapp-CognitoWebApp"
+      Action: "lambda:InvokeFunction"
+      SourceArn: "arn:aws:execute-api:us-west-2:381492204116:jfkfhkcth4/*/*/*"
+      Principal: "apigateway.amazonaws.com"

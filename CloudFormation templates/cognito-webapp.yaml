@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'cognito-webapp Amazon Cognito Workshop
+
+  '
+Resources:
+  CognitoWebApp:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-CognitoWebApp
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-webapp/ce0d85631ae5e65096da6b7d52ebcff2
+      Handler: run.sh
+      Runtime: nodejs18.x
+      MemorySize: 1024
+      Timeout: 3
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          RUST_LOG: info
+      Layers:
+      - Fn::Sub: arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:17
+      Events:
+        RootPath:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+        AnyPath:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      SamResourceId: CognitoWebApp
+Outputs:
+  CognitoWebAppURL:
+    Description: Cognito Workshop Web App URL
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/

@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'cognito-lambdas SAM Template for cognito-lambdas
+
+  '
+Globals:
+  Function:
+    Handler: app.lambdaHandler
+    Runtime: nodejs18.x
+    MemorySize: 1024
+    Timeout: 30
+    Tracing: Active
+    Architectures:
+    - x86_64
+Parameters:
+  UserPoolArn:
+    Type: String
+    Default: ''
+  UserPoolId:
+    Type: String
+    Default: ''
+  ClientId:
+    Type: String
+    Default: ''
+Resources:
+  PreToken:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-PreToken
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas/2fcc26317c87e2bfcf561bd6c6d1ad9a
+    Metadata:
+      SamResourceId: PreToken
+  PreTokenPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - PreToken
+        - Arn
+      Principal: cognito-idp.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn:
+        Ref: UserPoolArn
+    Metadata:
+      SamResourceId: PreTokenPermission
+  CreateAuthChallenge:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-CreateAuthChallenge
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas/43bc67bd403956092ab4cf942ed80af1
+    Metadata:
+      SamResourceId: CreateAuthChallenge
+  CreateAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - CreateAuthChallenge
+        - Arn
+      Principal: cognito-idp.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn:
+        Ref: UserPoolArn
+    Metadata:
+      SamResourceId: CreateAuthChallengePermission
+  DefineAuthChallenge:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-DefineAuthChallenge
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas/1f6855385963fecd7eb7ea168c9725c9
+    Metadata:
+      SamResourceId: DefineAuthChallenge
+  DefineAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - DefineAuthChallenge
+        - Arn
+      Principal: cognito-idp.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn:
+        Ref: UserPoolArn
+    Metadata:
+      SamResourceId: DefineAuthChallengePermission
+  VerifyAuthChallenge:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-VerifyAuthChallenge
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas/0065dab7e631413914341b263717a50c
+    Metadata:
+      SamResourceId: VerifyAuthChallenge
+  VerifyAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - VerifyAuthChallenge
+        - Arn
+      Principal: cognito-idp.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn:
+        Ref: UserPoolArn
+    Metadata:
+      SamResourceId: VerifyAuthChallengePermission
+  MigrateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-MigrateUser
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-tujus4pdsghh/cognito-lambdas/ac5cc3def345060aaa819144a0f45df6
+      Environment:
+        Variables:
+          AUTH_FLOW: ADMIN_USER_PASSWORD_AUTH
+          USERPOOL_ID:
+            Ref: UserPoolId
+          CLIENT_ID:
+            Ref: ClientId
+      Policies:
+      - AmazonCognitoPowerUser
+    Metadata:
+      SamResourceId: MigrateUser
+  MigrateUserPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - MigrateUser
+        - Arn
+      Principal: cognito-idp.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn:
+        Ref: UserPoolArn
+    Metadata:
+      SamResourceId: MigrateUserPermission
